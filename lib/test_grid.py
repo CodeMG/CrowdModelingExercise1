@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from grid import Grid, CellType
+from lib.grid import Grid
 
 
 class GridTest(unittest.TestCase):
