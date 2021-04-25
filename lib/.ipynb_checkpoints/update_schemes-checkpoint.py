@@ -67,33 +67,6 @@ class EuclideanUpdateScheme(UpdateScheme):
         return costs
 
 
-class DijkstraUpdateScheme(UpdateScheme):
-    def get_costs(self, grid: Grid):
-
-        # initialize with infinity
-        costs = np.ones((grid.rows, grid.columns)) * np.inf
-
-        def recursively_populate_neighbours(c: Coordinates, d: int):
-            costs[c] = d
-            for nc in DijkstraUpdateScheme.get_neighbours(c, grid.rows, grid.columns):
-                if nc not in grid.obstacles and costs[nc] > d:
-                    recursively_populate_neighbours(nc, d+1)
-
-        recursively_populate_neighbours(grid.target, 0)
-        return costs
-
-    @classmethod
-    def get_neighbours(cls, c: Coordinates, rows: int, columns: int):
-        options = [
-            (c[0] - 1, c[1]),
-            (c[0] + 1, c[1]),
-            (c[0], c[1] - 1),
-            (c[0], c[1] + 1)
-        ]
-        return [
-            nc for nc in options
-            if 0 <= nc[0] < rows and 0 <= nc[1] < columns
-        ]
 class EuclideanInteractiveUpdateScheme(UpdateScheme):
     
     def __init__(self,r_max: float):
