@@ -2,6 +2,7 @@ import unittest
 import numpy as np
 from lib.grid import Grid
 from lib.update_schemes import EuclideanUpdateScheme
+from lib.update_schemes import DijkstraUpdateScheme
 
 
 class UpdateSchemeTest(unittest.TestCase):
@@ -25,3 +26,11 @@ class UpdateSchemeTest(unittest.TestCase):
         self.assertEqual(costs.shape, self.grid.grid.shape)
         self.assertEqual(costs[3, 5], 0)  # distance at target is 0
         self.assertEqual(costs[1, 5], 2)
+
+    def test_dijkstra_update_scheme(self):
+        update_scheme = DijkstraUpdateScheme()
+        costs = update_scheme.get_costs(self.grid)
+        self.assertEqual(costs.shape, self.grid.grid.shape)
+        self.assertEqual(costs[(2, 3)], np.inf)
+        self.assertEqual(costs[(3, 5)], 0)
+        self.assertEqual(costs[(2, 5)], 1)
