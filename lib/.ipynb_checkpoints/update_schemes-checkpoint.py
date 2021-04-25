@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 from typing import List
 
-from lib.grid import Grid, Coordinates
+from lib.grid import Grid, Coordinates, CellType
 
 
 class UpdateScheme(ABC):
@@ -87,6 +87,32 @@ class EuclideanInteractiveUpdateScheme(UpdateScheme):
                 if r < self.r_max:
                     avoidance = np.exp(1/(r**2 - self.r_max**2))
                     costs[c] += avoidance
+        
+
+        return costs
+    
+class EuclideanObstacleAvoidingUpdateScheme(UpdateScheme):
+    
+    def __init__(self,r_max: float):
+        self.r_max = r_max
+
+    def d(self, c1: Coordinates, c2: Coordinates):
+        return np.sqrt((c1[0] - c2[0])**2 + (c1[1] - c2[1])**2)
+
+    def get_costs(self, grid: Grid) -> np.ndarray:
+        # initialize with zeros
+        costs = np.zeros((grid.rows, grid.columns))
+        indices = UpdateScheme.get_indices(grid.rows, grid.columns)
+        for c in indices:
+            if grid.grid[c] == CellType.OBSTACLE:
+                costs[c] = 1000
+            else:
+                costs[c] = self.d(c, grid.target)
+                for p in grid.get_pedestrians():
+                    r = self.d(c,p)
+                    if r < self.r_max:
+                        avoidance = np.exp(1/(r**2 - self.r_max**2))
+                        costs[c] += avoidance
         
 
         return costs
