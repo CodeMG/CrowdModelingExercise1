@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import numpy as np
-import copy
+from typing import List
 
 from lib.grid import Grid, Coordinates
 
@@ -31,7 +31,38 @@ class UpdateScheme(ABC):
         ]
         return min(options_with_cost, key=lambda pair: pair[1])[0]
 
+    @classmethod
+    def get_indices(cls, rows: int, columns: int) -> List[Coordinates]:
+        indices = np.indices((rows, columns))
+        return list(
+            map(
+                tuple,
+                np.stack(
+                    (indices[0].flatten(), indices[1].flatten()),
+                    axis=-1
+                )
+            )
+        )
+
 
 class RandomUpdateScheme(UpdateScheme):
     def get_costs(self, grid: Grid) -> np.ndarray:
         return np.random.rand(grid.rows, grid.columns)
+
+
+class EuclideanUpdateScheme(UpdateScheme):
+
+    def d(self, c1: Coordinates, c2: Coordinates):
+        return np.sqrt((c1[0] - c2[0])**2 + (c1[1] - c2[1])**2)
+
+    def get_costs(self, grid: Grid) -> np.ndarray:
+
+        # initialize with zeros
+        costs = np.zeros((grid.rows, grid.columns))
+
+        #
+        indices = UpdateScheme.get_indices(grid.rows, grid.columns)
+        for c in indices:
+            costs[c] = self.d(c, grid.target)
+
+        return costs
