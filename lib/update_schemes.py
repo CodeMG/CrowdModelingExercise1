@@ -24,7 +24,7 @@ class UpdateScheme(ABC):
     def move_pedestrian(self, p: Coordinates, costs: np.ndarray) -> Coordinates:
         # all the neighbours of this pedestrian and the costs of moving there
         options = [p, (p[0] - 1, p[1]), (p[0] + 1, p[1]),
-                   (p[0], p[1] - 1), (p[0], p[1] + 1), (p[0] - 1, p[1] -1), (p[0] + 1, p[1] + 1), (p[0] - 1, p[1] +1), (p[0] + 1, p[1] - 1)]
+                   (p[0], p[1] - 1), (p[0], p[1] + 1), (p[0] - 1, p[1] - 1), (p[0] + 1, p[1] + 1), (p[0] - 1, p[1] + 1), (p[0] + 1, p[1] - 1)]
         options_with_cost = [
             (option, costs[option]) for option in options
             if 0 <= option[0] <= costs.shape[0]-1 and 0 <= option[1] <= costs.shape[1]-1
@@ -49,8 +49,9 @@ class RandomUpdateScheme(UpdateScheme):
     def get_costs(self, grid: Grid) -> np.ndarray:
         return np.random.rand(grid.rows, grid.columns)
 
+
 class EuclideanUpdateScheme(UpdateScheme):
-    
+
     def d(self, c1: Coordinates, c2: Coordinates):
         return np.sqrt((c1[0] - c2[0])**2 + (c1[1] - c2[1])**2)
 
@@ -76,7 +77,7 @@ class DijkstraUpdateScheme(UpdateScheme):
         def recursively_populate_neighbours(c: Coordinates, d: int):
             costs[c] = d
             for nc in DijkstraUpdateScheme.get_neighbours(c, grid.rows, grid.columns):
-                if nc not in grid.obstacles and costs[nc] > d:
+                if nc not in grid.obstacles and costs[nc] > d+1:
                     recursively_populate_neighbours(nc, d+1)
 
         recursively_populate_neighbours(grid.target, 0)
@@ -94,9 +95,11 @@ class DijkstraUpdateScheme(UpdateScheme):
             nc for nc in options
             if 0 <= nc[0] < rows and 0 <= nc[1] < columns
         ]
+
+
 class EuclideanInteractiveUpdateScheme(UpdateScheme):
-    
-    def __init__(self,r_max: float):
+
+    def __init__(self, r_max: float):
         self.r_max = r_max
 
     def d(self, c1: Coordinates, c2: Coordinates):
@@ -110,17 +113,17 @@ class EuclideanInteractiveUpdateScheme(UpdateScheme):
         for c in indices:
             costs[c] = self.d(c, grid.target)
             for p in grid.get_pedestrians():
-                r = self.d(c,p)
+                r = self.d(c, p)
                 if r < self.r_max:
                     avoidance = np.exp(1/(r**2 - self.r_max**2))
                     costs[c] += avoidance
-        
 
         return costs
-    
+
+
 class EuclideanObstacleAvoidingUpdateScheme(UpdateScheme):
-    
-    def __init__(self,r_max: float):
+
+    def __init__(self, r_max: float):
         self.r_max = r_max
 
     def d(self, c1: Coordinates, c2: Coordinates):
@@ -136,10 +139,9 @@ class EuclideanObstacleAvoidingUpdateScheme(UpdateScheme):
             else:
                 costs[c] = self.d(c, grid.target)
                 for p in grid.get_pedestrians():
-                    r = self.d(c,p)
+                    r = self.d(c, p)
                     if r < self.r_max:
                         avoidance = np.exp(1/(r**2 - self.r_max**2))
                         costs[c] += avoidance
-        
 
         return costs
