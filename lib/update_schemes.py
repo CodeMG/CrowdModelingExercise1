@@ -3,6 +3,7 @@ import numpy as np
 from typing import List
 
 from lib.grid import Grid, Coordinates, CellType
+import random
 
 
 class UpdateScheme(ABC):
@@ -26,10 +27,19 @@ class UpdateScheme(ABC):
         neighbours = UpdateScheme.get_neighbours(
             p, costs.shape[0], costs.shape[1], diagonal=True) + [p]
 
-        options_with_cost = [
-            (option, costs[option]) for option in neighbours
+        options_with_cost_and_d = [
+            (option, costs[option], self.d(option, p)) for option in neighbours
         ]
-        return min(options_with_cost, key=lambda pair: pair[1])[0]
+        best_option_with_d = min(
+            options_with_cost_and_d, key=lambda triple: triple[1])
+        r = random.random()
+        if best_option_with_d[2] == 0 or r <= 1/best_option_with_d[2]:
+            return best_option_with_d[0]
+        else:
+            return p
+
+    def d(self, c1: Coordinates, c2: Coordinates):
+        return np.sqrt((c1[0] - c2[0])**2 + (c1[1] - c2[1])**2)
 
     @classmethod
     def get_indices(cls, rows: int, columns: int) -> List[Coordinates]:
@@ -72,9 +82,6 @@ class RandomUpdateScheme(UpdateScheme):
 
 class EuclideanUpdateScheme(UpdateScheme):
 
-    def d(self, c1: Coordinates, c2: Coordinates):
-        return np.sqrt((c1[0] - c2[0])**2 + (c1[1] - c2[1])**2)
-
     def get_costs(self, grid: Grid) -> np.ndarray:
 
         # initialize with zeros
@@ -109,9 +116,6 @@ class EuclideanInteractiveUpdateScheme(UpdateScheme):
     def __init__(self, r_max: float):
         self.r_max = r_max
 
-    def d(self, c1: Coordinates, c2: Coordinates):
-        return np.sqrt((c1[0] - c2[0])**2 + (c1[1] - c2[1])**2)
-
     def get_costs(self, grid: Grid) -> np.ndarray:
 
         # initialize with zeros
@@ -132,9 +136,6 @@ class EuclideanObstacleAvoidingUpdateScheme(UpdateScheme):
 
     def __init__(self, r_max: float):
         self.r_max = r_max
-
-    def d(self, c1: Coordinates, c2: Coordinates):
-        return np.sqrt((c1[0] - c2[0])**2 + (c1[1] - c2[1])**2)
 
     def get_costs(self, grid: Grid) -> np.ndarray:
         # initialize with zeros
