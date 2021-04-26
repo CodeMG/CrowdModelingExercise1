@@ -15,8 +15,8 @@ class UpdateSchemeTest(unittest.TestCase):
                 (2, 3)
             ],
             pedestrians=[
-                (1, 0),
-                (0, 1)
+                ((1, 0), 1),
+                ((0, 1), 1)
             ]
         )
 

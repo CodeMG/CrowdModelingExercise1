@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 from typing import List
 
-from lib.grid import Grid, Coordinates, CellType
+from lib.grid import Grid, Coordinates, Pedestrian, CellType
 import random
 
 
@@ -16,25 +16,26 @@ class UpdateScheme(ABC):
         costs = self.get_costs(grid)
 
         # move the pedestrians
-        moved_pedestrians = [self.move_pedestrian(
-            p, costs) for p in grid.get_pedestrians()]
+        moved_pedestrians = {key: self.move_pedestrian(
+            grid.pedestrians[key], costs) for key in grid.pedestrians.keys()}
 
         # update the pedestrians
         grid.update_pedestrians(moved_pedestrians)
 
-    def move_pedestrian(self, p: Coordinates, costs: np.ndarray) -> Coordinates:
+    def move_pedestrian(self, p: Pedestrian, costs: np.ndarray) -> Pedestrian:
         # all the neighbours of this pedestrian and the costs of moving there
         neighbours = UpdateScheme.get_neighbours(
-            p, costs.shape[0], costs.shape[1], diagonal=True) + [p]
+            p[0], costs.shape[0], costs.shape[1], diagonal=True) + [p[0]]
 
         options_with_cost_and_d = [
-            (option, costs[option], self.d(option, p)) for option in neighbours
+            (option, costs[option], self.d(option, p[0])) for option in neighbours
         ]
         best_option_with_d = min(
             options_with_cost_and_d, key=lambda triple: triple[1])
+
         r = random.random()
-        if best_option_with_d[2] == 0 or r <= 1/best_option_with_d[2]:
-            return best_option_with_d[0]
+        if best_option_with_d[2] == 0 or r <= p[1]/best_option_with_d[2]:
+            return (best_option_with_d[0], p[1])
         else:
             return p
 
@@ -123,7 +124,7 @@ class EuclideanInteractiveUpdateScheme(UpdateScheme):
         indices = UpdateScheme.get_indices(grid.rows, grid.columns)
         for c in indices:
             costs[c] = self.d(c, grid.target)
-            for p in grid.get_pedestrians():
+            for p in [p[0] for p in grid.pedestrians.values()]:
                 r = self.d(c, p)
                 if r < self.r_max:
                     avoidance = np.exp(1/(r**2 - self.r_max**2))
@@ -146,7 +147,7 @@ class EuclideanObstacleAvoidingUpdateScheme(UpdateScheme):
                 costs[c] = 1000
             else:
                 costs[c] = self.d(c, grid.target)
-                for p in grid.get_pedestrians():
+                for p in [p[0] for p in grid.pedestrians.values()]:
                     r = self.d(c, p)
                     if r < self.r_max:
                         avoidance = np.exp(1/(r**2 - self.r_max**2))

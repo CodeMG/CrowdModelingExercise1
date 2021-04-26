@@ -25,11 +25,11 @@ class GridDrawer:
             )
 
             # draw pedestrians
-            pedestrians = grid.get_pedestrians()
+            pedestrians_coordinates = [p[0] for p in grid.pedestrians.values()]
             self.canvas.fill_style = 'red'
             self.canvas.fill_rects(
-                x=[p[1] * cell_width for p in pedestrians],
-                y=[p[0] * cell_height for p in pedestrians],
+                x=[p[1] * cell_width for p in pedestrians_coordinates],
+                y=[p[0] * cell_height for p in pedestrians_coordinates],
                 width=cell_width - 1,
                 height=cell_height - 1
             )
@@ -53,3 +53,8 @@ class GridDrawer:
             )
 
             return self.canvas
+
+
+pedestrians.append(
+        ((int(newX+targetPos[0]), int(newY+targetPos[1])), 1)
+    )
