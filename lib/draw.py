@@ -53,8 +53,3 @@ class GridDrawer:
             )
 
             return self.canvas
-
-
-pedestrians.append(
-        ((int(newX+targetPos[0]), int(newY+targetPos[1])), 1)
-    )
