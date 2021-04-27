@@ -114,6 +114,8 @@ class DijkstraUpdateScheme(UpdateScheme):
                     recursively_populate_neighbours(nc, d+1)
 
         recursively_populate_neighbours(grid.target, 0)
+        for key in grid.pedestrians.keys():
+            costs[grid.pedestrians[key][0]] = 1000
         return costs
 
 
