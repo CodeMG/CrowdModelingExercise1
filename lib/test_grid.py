@@ -2,10 +2,11 @@ import unittest
 import numpy as np
 from lib.grid import Grid
 
-
+#This Class is just a class for testing the grid(Not used for anything else)
 class GridTest(unittest.TestCase):
-
+    
     def setUp(self):
+        
         self.pedestrians = [
             ((0, 0), 1),
             ((1, 2), 1)

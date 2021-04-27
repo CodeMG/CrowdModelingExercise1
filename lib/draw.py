@@ -6,9 +6,17 @@ from lib.grid import Grid
 class GridDrawer:
 
     def __init__(self, canvas: Canvas):
+        """  
+        :param canvas: This is the canvas on which the cellular automaton is going to be drawn
+        """
         self.canvas = canvas
 
     def draw(self, grid: Grid):
+        """  
+        Draws the Grid
+        :param grid: This is the Grid object which is supposed to be drawn
+        :return: the canvas on which was drawn
+        """
         cell_width = self.canvas.width / grid.columns
         cell_height = self.canvas.height / grid.rows
         self.canvas.clear()
