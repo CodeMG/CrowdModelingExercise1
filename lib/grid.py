@@ -35,7 +35,13 @@ class Grid:
             self.grid[pedestrians[key][0]] = key
 
         self.pedestrians = pedestrians
-
+        
+    def update_pedestrian(self, pedestrian: Coordinates, key: int) -> None:
+        # set the cells with current pedestrians to EMPTY
+        self.grid[self.grid is key] = CellType.EMPTY
+        self.grid[self.pedestrians[key][0]] = key
+        self.pedestrians[key] = pedestrian
+    
     def _put_target(self, target: Tuple[int, int]) -> None:
         self.grid[target[0], target[1]] = CellType.TARGET
 

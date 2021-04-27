@@ -13,14 +13,19 @@ class UpdateScheme(ABC):
         pass
 
     def update(self, grid: Grid) -> None:
-        costs = self.get_costs(grid)
+        #costs = self.get_costs(grid)
 
         # move the pedestrians
-        moved_pedestrians = {key: self.move_pedestrian(
-            grid.pedestrians[key], costs) for key in grid.pedestrians.keys()}
+        #moved_pedestrians = {key: self.move_pedestrian(
+            #grid.pedestrians[key], costs) for key in grid.pedestrians.keys()}
 
         # update the pedestrians
-        grid.update_pedestrians(moved_pedestrians)
+        #grid.update_pedestrians(moved_pedestrians)
+        
+        
+        for key in grid.pedestrians.keys():
+            costs = self.get_costs(grid)
+            grid.update_pedestrian(self.move_pedestrian(grid.pedestrians[key], costs),key)
 
     def move_pedestrian(self, p: Pedestrian, costs: np.ndarray) -> Pedestrian:
         # all the neighbours of this pedestrian and the costs of moving there
@@ -152,5 +157,8 @@ class EuclideanObstacleAvoidingUpdateScheme(UpdateScheme):
                     if r < self.r_max:
                         avoidance = np.exp(1/(r**2 - self.r_max**2))
                         costs[c] += avoidance
+                        
+        for key in grid.pedestrians.keys():
+            costs[grid.pedestrians[key][0]] = 1000
 
         return costs
