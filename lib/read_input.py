@@ -12,7 +12,8 @@ def ReadInput(name: str):
     pedestrians = []
     p = int(lines[2])
     for i in range(3, 3+p):
-        pedestrians.insert(i, eval(lines[i]))
+        x = lines[i].split(", ")
+        pedestrians.append(((int(x[0].strip()), int(x[1].strip())), float(x[2].strip())))
 
     obstacles = []
     o = int(lines[3+p])
