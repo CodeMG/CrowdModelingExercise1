@@ -12,20 +12,22 @@ class UpdateScheme(ABC):
     def get_costs(self, grid: Grid) -> np.ndarray:
         pass
 
-    def update(self, grid: Grid) -> None:
-        #costs = self.get_costs(grid)
-
-        # move the pedestrians
-        #moved_pedestrians = {key: self.move_pedestrian(
-            #grid.pedestrians[key], costs) for key in grid.pedestrians.keys()}
-
-        # update the pedestrians
-        #grid.update_pedestrians(moved_pedestrians)
+    def update(self, grid: Grid, avoidOverlapping: bool) -> None:
         
         
-        for key in grid.pedestrians.keys():
+        if avoidOverlapping:
+            for key in grid.pedestrians.keys():
+                costs = self.get_costs(grid)
+                grid.update_pedestrian(self.move_pedestrian(grid.pedestrians[key], costs),key)
+        else:
             costs = self.get_costs(grid)
-            grid.update_pedestrian(self.move_pedestrian(grid.pedestrians[key], costs),key)
+
+            # move the pedestrians
+            moved_pedestrians = {key: self.move_pedestrian(
+                grid.pedestrians[key], costs) for key in grid.pedestrians.keys()}
+
+            # update the pedestrians
+            grid.update_pedestrians(moved_pedestrians)
 
     def move_pedestrian(self, p: Pedestrian, costs: np.ndarray) -> Pedestrian:
         # all the neighbours of this pedestrian and the costs of moving there
