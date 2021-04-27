@@ -4,7 +4,7 @@ from lib.grid import Grid
 from lib.update_schemes import EuclideanUpdateScheme
 from lib.update_schemes import DijkstraUpdateScheme
 
-
+#This Class is just a class for testing the update schemes(Not used for anything else)
 class UpdateSchemeTest(unittest.TestCase):
     def setUp(self):
         self.grid = Grid(
@@ -15,8 +15,8 @@ class UpdateSchemeTest(unittest.TestCase):
                 (2, 3)
             ],
             pedestrians=[
-                (1, 0),
-                (0, 1)
+                ((1, 0), 1),
+                ((0, 1), 1)
             ]
         )
 

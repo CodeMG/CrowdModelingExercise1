@@ -6,9 +6,17 @@ from lib.grid import Grid
 class GridDrawer:
 
     def __init__(self, canvas: Canvas):
+        """  
+        :param canvas: This is the canvas on which the cellular automaton is going to be drawn
+        """
         self.canvas = canvas
 
     def draw(self, grid: Grid):
+        """  
+        Draws the Grid
+        :param grid: This is the Grid object which is supposed to be drawn
+        :return: the canvas on which was drawn
+        """
         cell_width = self.canvas.width / grid.columns
         cell_height = self.canvas.height / grid.rows
         self.canvas.clear()
@@ -25,11 +33,11 @@ class GridDrawer:
             )
 
             # draw pedestrians
-            pedestrians = grid.get_pedestrians()
+            pedestrians_coordinates = [p[0] for p in grid.pedestrians.values()]
             self.canvas.fill_style = 'red'
             self.canvas.fill_rects(
-                x=[p[1] * cell_width for p in pedestrians],
-                y=[p[0] * cell_height for p in pedestrians],
+                x=[p[1] * cell_width for p in pedestrians_coordinates],
+                y=[p[0] * cell_height for p in pedestrians_coordinates],
                 width=cell_width - 1,
                 height=cell_height - 1
             )
